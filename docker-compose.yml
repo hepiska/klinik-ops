@@ -1,0 +1,51 @@
+version: "3"
+services:
+  traefik:
+    image: traefik:alpine
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - web
+    expose:
+      - "8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/traefik/traefik.toml:/traefik.toml
+      - /opt/traefik/acme.json:/acme.json
+    labels:
+      - "traefik.port=8080"
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:monitor.boengkoes.id"
+      - "traefik.frontend.auth.basic.users=$TRAEFIK_BASIC_AUTH"
+  api:
+    container_name: kelak
+    restart: always
+    networks: 
+      - web
+    build: .
+    ports:
+      - "4000"
+    environment:
+      WAIT_HOSTS: mongo:27017
+    labels:
+      - traefik.enable=true
+      - "traefik.frontend.rule=Host:api.kelak.info"
+      - "traefik.port=4000"
+      - "traefik.docker.network=web"
+  mongo:
+    image: mongo:3.6
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: $DB_USERNAME
+      MONGO_INITDB_ROOT_PASSWORD: $DB_PASSWORD
+    ports:
+      - "27017:27017"
+    networks:
+      - web
+    volumes:
+      - mongo:/var/lib/mongo
+  networks:
+  web:
+    external:
+      name: web
