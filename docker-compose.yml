@@ -16,14 +16,14 @@ services:
     labels:
       - "traefik.port=8080"
       - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:monitor.kelak.info"
+      - "traefik.frontend.rule=Host:monit.kelak.info"
       - "traefik.frontend.auth.basic.users=$TRAEFIK_BASIC_AUTH"
   api:
     container_name: kelak
     restart: always
+    image: kelakapp
     networks: 
       - web
-    build: .
     ports:
       - "4000"
     environment:
