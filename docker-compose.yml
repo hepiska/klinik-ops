@@ -44,11 +44,11 @@ services:
     networks:
       - web
     volumes:
-      - mongo:/var/lib/mongo
+      - mongo: /var/lib/mongo
 networks:
   web:
     external:
       name: web
 volumes:
   mongo:
-    - mongo:/var/lib/mongo
+    - mongo: /var/lib/mongo
