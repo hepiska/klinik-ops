@@ -46,6 +46,6 @@ services:
     volumes:
       - mongo:/var/lib/mongo
   networks:
-  web:
-    external:
-      name: web
+    web:
+      external:
+        name: web
