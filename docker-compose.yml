@@ -50,4 +50,5 @@ networks:
     external:
       name: web
 volumes:
-  mongo: mongo:/var/lib/mongo
+  mongo:
+    - mongo:/var/lib/mongo
