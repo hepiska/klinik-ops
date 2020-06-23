@@ -17,7 +17,7 @@ services:
       - "traefik.port=8080"
       - "traefik.enable=true"
       - "traefik.frontend.rule=Host:monit.kelak.info"
-      - "traefik.frontend.auth.basic.users=$TRAEFIK_BASIC_AUTH"
+      - "traefik.http.middlewares.test-auth.basicauth.users=$TRAEFIK_BASIC_AUTH"
   api:
     container_name: kelak
     restart: always
