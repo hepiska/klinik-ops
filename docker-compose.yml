@@ -21,7 +21,7 @@ services:
   api:
     container_name: kelak
     restart: always
-    image: kelakapp
+    image: ghcr.io/hepiska/kelakbe:latest
     networks: 
       - web
     ports:
@@ -29,7 +29,7 @@ services:
     environment:
       WAIT_HOSTS: mongo:27017
     labels:
-      - traefik.enable=true
+      - "traefik.enable=true"
       - "traefik.frontend.rule=Host:api.kelak.info"
       - "traefik.port=4000"
       - "traefik.docker.network=web"
