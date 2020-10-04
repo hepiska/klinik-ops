@@ -35,6 +35,19 @@ services:
       - "traefik.frontend.rule=Host:api.kelak.info"
       - "traefik.port=4000"
       - "traefik.docker.network=web"
+  admin:
+    container_name: kelak-admin
+    restart: always
+    image: ghcr.io/hepiska/kelak-admin:latest
+    networks: 
+      - web
+    ports:
+      - "4040:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:admin.kelak.info"
+      - "traefik.port=4040"
+      - "traefik.docker.network=web"
   mongo:
     image: mongo:3.6
     restart: always
