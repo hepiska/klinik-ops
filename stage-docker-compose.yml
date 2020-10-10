@@ -16,14 +16,14 @@ services:
     labels:
       - "traefik.port=8080"
       - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:monit.kelak.info"
+      - "traefik.frontend.rule=Host:monit.stage.emedika.id"
       - "traefik.http.middlewares.test-auth.basicauth.users=$TRAEFIK_BASIC_AUTH"
-  api:
-    container_name: kelak-api
+  user:
+    container_name: emedika-user
     env_file:
-     - ./api.env
+     - ./user.env
     restart: always
-    image: ghcr.io/hepiska/kelakbe:latest
+    image: 
     networks: 
       - web
     ports:
@@ -32,33 +32,45 @@ services:
       WAIT_HOSTS: mongo:27017
     labels:
       - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:api.kelak.info"
+      - "traefik.frontend.rule=Host:user.stage.emedika.id"
       - "traefik.port=4000"
       - "traefik.docker.network=web"
-  admin:
-    container_name: kelak-admin
+  apotek:
+    container_name: emedika-apotek
     restart: always
-    image: ghcr.io/hepiska/kelak-admin:latest
+    image: 
     networks: 
       - web
     ports:
-      - "4040:80"
+      - "4040"
     labels:
       - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:admin.kelak.info"
+      - "traefik.frontend.rule=Host:apotek.stage.emedika.id"
       - "traefik.docker.network=web"
+  postgre:
+    container_name: postgre
+    image: postgres:alpine
+    volumes:
+      - ./datadir/postgre:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: $PG_PASSWORD
+      POSTGRES_USER: $PG_USERNAME
+    network_mode: "host"
   mongo:
     image: mongo:3.6
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: $DB_USERNAME
-      MONGO_INITDB_ROOT_PASSWORD: $DB_PASSWORD
+      MONGO_INITDB_ROOT_USERNAME: $MONGO_USERNAME
+      MONGO_INITDB_ROOT_PASSWORD: $MONGO_PASSWORD
     ports:
       - "27017:27017"
     networks:
       - web
     volumes:
-      - ./datadir:/var/lib/mongo
+      - ./datadir/mongo:/var/lib/mongo
 networks:
   web:
     external:
