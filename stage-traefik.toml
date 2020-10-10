@@ -21,7 +21,7 @@ debug = true
 
 [docker]
 endpoint = "unix:///var/run/docker.sock"
-domain = "kelak.info"
+domain = "emedika.id"
 exposedByDefault = false
 watch = true
 network = "web"
