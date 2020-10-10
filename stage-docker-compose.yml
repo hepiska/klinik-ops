@@ -23,7 +23,7 @@ services:
     env_file:
      - ./user.env
     restart: always
-    image: 
+    image: ghcr.io/hepiska/emedika-user:latest
     networks: 
       - web
     ports:
