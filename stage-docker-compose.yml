@@ -38,7 +38,7 @@ services:
   apotek:
     container_name: emedika-apotek
     restart: always
-    image: 
+    image: need-change
     networks: 
       - web
     ports:
