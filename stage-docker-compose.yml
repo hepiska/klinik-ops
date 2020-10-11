@@ -71,6 +71,10 @@ services:
       - web
     volumes:
       - ./datadir/mongo:/var/lib/mongo
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:mongo.stage.emedika.id"
+      - "traefik.docker.network=web"
 networks:
   web:
     external:
