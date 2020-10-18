@@ -38,11 +38,11 @@ services:
   apotek:
     container_name: emedika-apotek
     restart: always
-    image: need-change
+    image: ghcr.io/hepiska/emedika-apotek-stage:latest
     networks: 
       - web
     ports:
-      - "4040"
+      - "3000"
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.rule=Host:apotek.stage.emedika.id"
