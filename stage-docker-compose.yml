@@ -38,6 +38,8 @@ services:
   apotek:
     container_name: emedika-apotek
     restart: always
+    env_file:
+     - ./apotek.env
     image: ghcr.io/hepiska/emedika-apotek-stage:latest
     networks: 
       - web
