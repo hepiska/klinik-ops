@@ -49,6 +49,18 @@ services:
       - "traefik.enable=true"
       - "traefik.frontend.rule=Host:apotek.stage.emedika.id"
       - "traefik.docker.network=web"
+  admin-app:
+    container_name: emedika-admin-app
+    restart: always
+    image: ghcr.io/hepiska/emedika-admin-fe-stg:latest
+    networks: 
+      - web
+    ports:
+      - "3030:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:admin.stage.emedika.id"
+      - "traefik.docker.network=web"
   postgre:
     container_name: postgre
     image: postgres:alpine
