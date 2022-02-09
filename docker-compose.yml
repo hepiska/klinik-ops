@@ -1,0 +1,149 @@
+version: "3"
+services:
+  traefik:
+    image: traefik:v2.5
+    command: > 
+      --api=true
+      --api.dashboard=true
+      --providers.docker
+      --providers.docker.endpoint=unix:///var/run/docker.sock
+      --providers.docker.network=web
+      --providers.docker.exposedbydefault=false
+      --entrypoints.web.address=:80
+      --entrypoints.websecure.address=:443
+      --certificatesResolvers.letsencryptresolver.acme.email=franatagola@gmail.com
+      --certificatesResolvers.letsencryptresolver.acme.storage=acme.json
+      --certificatesResolvers.letsencryptresolver.acme.httpChallenge.entryPoint=web
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/traefik/acme.json:/acme.json
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`monitor.emedika.id`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencryptresolver"
+        # Global redirection: http to https
+      - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:(www\\.)?.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=wwwtohttps"
+
+      - "traefik.http.middlewares.wwwtohttps.redirectregex.regex=^https?://(?:www\\.)?(.+)"
+      - "traefik.http.middlewares.wwwtohttps.redirectregex.replacement=https://$${1}"
+      - "traefik.http.middlewares.wwwtohttps.redirectregex.permanent=true"
+  user:
+    container_name: emedika-user
+    env_file:
+     - ./user.env
+    restart: always
+    image: ghcr.io/hepiska/emedika-user:latest
+    networks: 
+      - web
+    ports:
+      - "4000"
+    environment:
+      WAIT_HOSTS: mongo:27017
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.app.rule=Host(`user.emedika.id`)
+      - "traefik.http.services.app.loadbalancer.server.port=4000"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls.certresolver=letsencryptresolver"
+  apotek:
+    container_name: emedika-apotek
+    restart: always
+    env_file:
+     - ./apotek.env
+    image: ghcr.io/hepiska/emedika-apotek-stage:latest
+    networks: 
+      - web
+    ports:
+      - "3000"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.app.rule=Host(`apotek.emedika.id`)
+      - "traefik.http.services.app.loadbalancer.server.port=3000"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls.certresolver=letsencryptresolver"
+  admin-app:
+    container_name: emedika-admin-app
+    restart: always
+    image: ghcr.io/hepiska/emedika-admin-fe-stg:latest
+    networks: 
+      - web
+    ports:
+      - "3030:80"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.app.rule=Host(`admin.emedika.id`)
+      - "traefik.http.services.app.loadbalancer.server.port=3030"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls.certresolver=letsencryptresolver"
+  postgre:
+    container_name: postgre
+    image: postgres:alpine
+    volumes:
+      - ./datadir/postgre:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: $PG_PASSWORD
+      POSTGRES_USER: $PG_USERNAME
+    network_mode: "host"
+  mongo:
+    image: mongo:3.6
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: $MONGO_USERNAME
+      MONGO_INITDB_ROOT_PASSWORD: $MONGO_PASSWORD
+    ports:
+      - "27017:27017"
+    networks:
+      - web
+    volumes:
+      - ./datadir/mongo:/var/lib/mongo
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:mongo.stage.emedika.id"
+      - "traefik.docker.network=web"
+  backup_mongo:
+    container_name: backup_mongo
+    image: tmannherz/mongo-gce-backup
+    depends_on:
+      - mongo
+    restart: always
+    environment:
+      MONGO_HOST: mongo
+      GS_PROJECT_ID: boengkoes-333403
+      GS_SERVICE_EMAIL: gcs-549@boengkoes-333403.iam.gserviceaccount.com
+      GS_BACKUP_BUCKET: emedika_mongo_backup
+      MONGO_DATABASE: emedika_user
+    secrets:
+      - service_account
+  backup_psg:
+    container_name: backup_psg
+    image: "nullriver/postgres-docker-gcs-backup:latest"
+    depends_on:
+      - postgre
+    networks:
+      - internet
+      - api-internal
+    environment:
+      SCHEDULE: "@every 6h"
+      POSTGRES_HOST: "postgre"
+      POSTGRES_DATABASE: "apotek"
+      POSTGRES_USER: $PG_PASSWORD
+      POSTGRES_PASSWORD: $PG_USERNAME
+      GCLOUD_KEYFILE_BASE64: "BASE64_PROJECT_KEYFILE_HERE"
+      GCLOUD_PROJECT_ID: "boengkoes-333403"
+      GCS_BACKUP_BUCKET: "gs://emedika_pg_backup"
+networks:
+  web:
+    external:
+      name: web
