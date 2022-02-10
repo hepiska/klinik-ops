@@ -95,9 +95,10 @@ services:
     environment:
       POSTGRES_PASSWORD: $PG_PASSWORD
       POSTGRES_USER: $PG_USERNAME
-    network_mode: "host"
+    # network_mode: "host"
   mongo:
     image: mongo:3.6
+    container_name: mongo
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: $MONGO_USERNAME
