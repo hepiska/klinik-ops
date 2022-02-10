@@ -132,8 +132,7 @@ services:
     depends_on:
       - postgre
     networks:
-      - internet
-      - api-internal
+      - web
     environment:
       SCHEDULE: "@every 6h"
       POSTGRES_HOST: "postgre"
