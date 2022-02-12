@@ -87,6 +87,9 @@ services:
   postgre:
     container_name: postgre
     image: postgres:alpine
+    
+    networks:
+      - web
     volumes:
       - ./datadir/postgre:/var/lib/postgresql/data
     ports:
