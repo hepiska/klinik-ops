@@ -79,7 +79,7 @@ services:
       - "3030:80"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.dashboard.rule=Host(`admin.emedika.id`)
+      - traefik.http.routers.dashboard.rule=Host(`pos.emedika.id`)
       - "traefik.http.services.dashboard.loadbalancer.server.port=3030"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.routers.dashboard.tls.certresolver=letsencryptresolver"
