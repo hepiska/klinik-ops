@@ -45,15 +45,15 @@ services:
     networks: 
       - web
     ports:
-      - "4000"
+      - "4000:4000"
     environment:
       WAIT_HOSTS: mongo:27017
     labels:
       - traefik.enable=true
-      - traefik.http.routers.app.rule=Host(`user.emedika.id`)
-      - "traefik.http.services.app.loadbalancer.server.port=4000"
-      - "traefik.http.routers.app.entrypoints=websecure"
-      - "traefik.http.routers.app.tls.certresolver=letsencryptresolver"
+      - traefik.http.routers.user.rule=Host(`user.emedika.id`)
+      - "traefik.http.services.user.loadbalancer.server.port=4000"
+      - "traefik.http.routers.user.entrypoints=websecure"
+      - "traefik.http.routers.user.tls.certresolver=letsencryptresolver"
   apotek:
     container_name: emedika-apotek
     restart: always
@@ -63,14 +63,14 @@ services:
     networks: 
       - web
     ports:
-      - "3000"
+      - "3000:3000"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.app.rule=Host(`apotek.emedika.id`)
-      - "traefik.http.services.app.loadbalancer.server.port=3000"
-      - "traefik.http.routers.app.entrypoints=websecure"
-      - "traefik.http.routers.app.tls.certresolver=letsencryptresolver"
-  admin-app:
+      - traefik.http.routers.apotek.rule=Host(`apotek.emedika.id`)
+      - "traefik.http.services.apotek.loadbalancer.server.port=3000"
+      - "traefik.http.routers.apotek.entrypoints=websecure"
+      - "traefik.http.routers.apotek.tls.certresolver=letsencryptresolver"
+  admin:
     container_name: emedika-admin-app
     restart: always
     image: ghcr.io/hepiska/emedika-admin-fe-stg:latest
@@ -80,10 +80,10 @@ services:
       - "3030:80"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.app.rule=Host(`admin.emedika.id`)
-      - "traefik.http.services.app.loadbalancer.server.port=3030"
-      - "traefik.http.routers.app.entrypoints=websecure"
-      - "traefik.http.routers.app.tls.certresolver=letsencryptresolver"
+      - traefik.http.routers.admin.rule=Host(`admin.emedika.id`)
+      - "traefik.http.services.admin.loadbalancer.server.port=3030"
+      - "traefik.http.routers.admin.entrypoints=websecure"
+      - "traefik.http.routers.admin.tls.certresolver=letsencryptresolver"
   postgre:
     container_name: postgre
     image: postgres:alpine
@@ -112,10 +112,6 @@ services:
       - web
     volumes:
       - ./datadir/mongo:/var/lib/mongo
-    labels:
-      - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:mongo.stage.emedika.id"
-      - "traefik.docker.network=web"
   backup_mongo:
     container_name: backup_mongo
     image: tmannherz/mongo-gce-backup
