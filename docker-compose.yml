@@ -71,7 +71,7 @@ services:
       - "traefik.http.routers.apotek.entrypoints=websecure"
       - "traefik.http.routers.apotek.tls.certresolver=letsencryptresolver"
   dashboard:
-    container_name: emedika-admin-app
+    container_name: dashboard
     restart: always
     image: ghcr.io/hepiska/emedika-admin-fe-stg:latest
     networks: 
