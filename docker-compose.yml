@@ -70,7 +70,7 @@ services:
       - "traefik.http.services.apotek.loadbalancer.server.port=3000"
       - "traefik.http.routers.apotek.entrypoints=websecure"
       - "traefik.http.routers.apotek.tls.certresolver=letsencryptresolver"
-  admin:
+  dashboard:
     container_name: emedika-admin-app
     restart: always
     image: ghcr.io/hepiska/emedika-admin-fe-stg:latest
@@ -80,10 +80,10 @@ services:
       - "3030:80"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.admin.rule=Host(`admin.emedika.id`)
-      - "traefik.http.services.admin.loadbalancer.server.port=3030"
-      - "traefik.http.routers.admin.entrypoints=websecure"
-      - "traefik.http.routers.admin.tls.certresolver=letsencryptresolver"
+      - traefik.http.routers.dashboard.rule=Host(`admin.emedika.id`)
+      - "traefik.http.services.dashboard.loadbalancer.server.port=3030"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencryptresolver"
   postgre:
     container_name: postgre
     image: postgres:alpine
