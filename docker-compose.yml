@@ -67,7 +67,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.apotek.rule=Host(`apotek.emedika.id`)
-      - "traefik.http.services.apotek.loadbalancer.server.port=3000"
       - "traefik.http.routers.apotek.entrypoints=websecure"
       - "traefik.http.routers.apotek.tls.certresolver=letsencryptresolver"
   dashboard:
