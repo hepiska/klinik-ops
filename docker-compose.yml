@@ -77,7 +77,7 @@ services:
     networks: 
       - web
     ports:
-      - "80:3030"
+      - "3030:80"
     labels:
       - traefik.enable=true
       - traefik.http.routers.admin.rule=Host(`admin.emedika.id`)
